@@ -10,7 +10,7 @@ except:
     os.system('pip install requests fake_useragent bs4 telebot ')
 # Bot configuration
 TOKEN = "7901171759:AAFPdDsnGxuRv-iNg8kyDIVP1NCMl1NrwR0"  # Replace with your bot token
-OWNER_ID = 7465126380 # Replace with your owner ID
+OWNER_ID = 7465126380# Replace with your owner ID
 
 # Initialize the bot
 bot = telebot.TeleBot(TOKEN, parse_mode="HTML")
@@ -22,6 +22,21 @@ APPROVED_USERS_FILE = "approved_users.txt"
 processing = {}
 stop_processing = {}
 approved_users = set()
+
+@bot.message_handler(commands=["refresh"])
+def refresh_user(message):
+    user_id = str(message.from_user.id)
+    if user_id not in load_approved_users():
+        bot.reply_to(message, "𝘠𝘰𝘶 𝘢𝘳𝘦 𝘯𝘰𝘵 𝘢𝘱𝘱𝘳𝘰𝘷𝘦𝘥 𝘵𝘰 𝘶𝘴𝘦 𝘵𝘩𝘪𝘴 𝘣𝘰𝘵. 𝘊𝘰𝘯𝘵𝘢𝘤𝘵 𝘵𝘩𝘦 𝘰𝘸𝘯𝘦𝘳- @notgamerayush")
+        return
+    if user_id in processing and processing[user_id]:
+        stop_processing[user_id] = True  # Stop the stuck process
+        processing[user_id] = False  # Reset user's state
+
+        bot.reply_to(message, "🔄 Your stuck process has been refreshed! You can now send a new file.")
+    else:
+        bot.reply_to(message, "✅ No stuck process found. You can use the bot normally.")
+
 
 def remove(filename: str, delete_line: str) -> None:
         with open(filename, "r+") as io:
@@ -47,7 +62,7 @@ def add_approved_user(user_id):
 
 # Ban a user
 def ban_user(user_id):
-    remove("approved_users.txt", user_id)
+    remove(APPROVED_USERS_FILE, user_id)
 
 # Generate approved card message
 def generate_approved_message(cc, response, bin_info, time_taken):
@@ -63,7 +78,7 @@ def generate_approved_message(cc, response, bin_info, time_taken):
 𝙄𝙨𝙨𝙪𝙚𝙧 ➼ {bin_info.get('bank', 'Unknown')}
 𝘽𝙞𝙣 ➼ {cc[:6]}
 𝙏𝙞𝙢𝙚 ➼ {time_taken}
-𝗕𝗼𝘁 𝗕𝘆: @HARISH_GAMER1
+𝗕𝗼𝘁 𝗕𝘆: @notgamerayush
 """
 
 # Handle /start command
@@ -71,7 +86,7 @@ def generate_approved_message(cc, response, bin_info, time_taken):
 def start(message):
     user_id = str(message.from_user.id)
     if user_id not in load_approved_users():
-        bot.reply_to(message, "𝘠𝘰𝘶 𝘢𝘳𝘦 𝘯𝘰𝘵 𝘢𝘱𝘱𝘳𝘰𝘷𝘦𝘥 𝘵𝘰 𝘶𝘴𝘦 𝘵𝘩𝘪𝘴 𝘣𝘰𝘵. 𝘊𝘰𝘯𝘵𝘢𝘤𝘵 𝘵𝘩𝘦 𝘰𝘸𝘯𝘦𝘳- @HARISH_GAMER1")
+        bot.reply_to(message, "𝘠𝘰𝘶 𝘢𝘳𝘦 𝘯𝘰𝘵 𝘢𝘱𝘱𝘳𝘰𝘷𝘦𝘥 𝘵𝘰 𝘶𝘴𝘦 𝘵𝘩𝘪𝘴 𝘣𝘰𝘵. 𝘊𝘰𝘯𝘵𝘢𝘤𝘵 𝘵𝘩𝘦 𝘰𝘸𝘯𝘦𝘳- @notgamerayush")
         return
     bot.reply_to(message, "𝗦𝗲𝗻𝗱 𝗧𝗵𝗲 𝗙𝗶𝗹𝗲 𝗧𝗼 𝗖𝗵𝗲𝗰𝗸 ✔️")
 
@@ -98,7 +113,7 @@ def ban_user_command(message):
     try:
         user_id_to_ban = message.text.split()[1]
         ban_user(user_id_to_ban)
-        bot.reply_to(message, f"𝗨𝘀𝗲𝗿 {user_id_to_ban} 𝐡𝐚𝐬 𝐛𝐞𝐞𝐧 𝗕𝗮𝗻𝗻𝗲𝗱.")
+        bot.reply_to(message, f"𝗨𝘀𝗲𝗿 {user_id_to_ban} 𝐡𝐚𝐬 𝐛𝐞𝐞𝐧 **Removed**")
     except IndexError:
         bot.reply_to(message, "𝗣𝗿𝗼𝘃𝗶𝗱𝗲 𝗮 𝘂𝘀𝗲𝗿 𝗜𝗗 𝘁𝗼 𝗯𝗮𝗻..")
 
@@ -107,7 +122,7 @@ def ban_user_command(message):
 def handle_document(message):
     user_id = str(message.from_user.id)
     if user_id not in load_approved_users():
-        bot.reply_to(message, "𝘊𝘰𝘯𝘵𝘢𝘤𝘵 𝘵𝘩𝘦 𝘰𝘸𝘯𝘦𝘳- @HARISH_GAMER1")
+        bot.reply_to(message, "𝘊𝘰𝘯𝘵𝘢𝘤𝘵 𝘵𝘩𝘦 𝘰𝘸𝘯𝘦𝘳- @notgamerayush")
         return
 
     if processing.get(user_id, False):
@@ -150,6 +165,7 @@ def process_cards(message, file_path, user_id, ko):
                     bin_info = requests.get(bin_data_url).json()
                 except Exception as e:
                     print(f"BIN Lookup Error: {e}")
+                    
 
                 # Inline keyboard with Stop button
                 mes = types.InlineKeyboardMarkup(row_width=1)
@@ -157,7 +173,8 @@ def process_cards(message, file_path, user_id, ko):
                 cm2 = types.InlineKeyboardButton(f"• 𝗔𝗽𝗽𝗿𝗼𝘃𝗲𝗱 ✅: [ {ch} ] •", callback_data='x')
                 cm3 = types.InlineKeyboardButton(f"• 𝗗𝗲𝗮𝗱 ❌: [ {dd} ] •", callback_data='x')
                 cm4 = types.InlineKeyboardButton(f"• 𝗧𝗼𝘁𝗮𝗹 💎: [ {total} ] •", callback_data='x')
-                mes.add(cm1, cm2, cm3, cm4)
+                stop_btn = types.InlineKeyboardButton("[ 𝗦𝘁𝗼𝗽 🛑 ] ", callback_data='stop_process')
+                mes.add(cm1, cm2, cm3, cm4, stop_btn)
 
                 bot.edit_message_text(chat_id=message.chat.id, message_id=ko, text='''𝘾𝙃𝙀𝘾𝙆𝙄𝙉𝙂 𝙔𝙊𝙐𝙍 𝘾𝘼𝙍𝘿𝙎...''', reply_markup=mes)
 
@@ -165,11 +182,12 @@ def process_cards(message, file_path, user_id, ko):
                 try:
                     last = str(braintree_auth(cc))  # Use the Tele function from gatet.py
                 except Exception as e:
+                    last = "Error"
                     print(e)
                     
 
                 # Update counts based on response
-                if "Approved ✅" in last:
+                if "Approved" in last:
                     ch += 1
                     approved_message = generate_approved_message(cc, "Approved", bin_info, "4.6")
                     bot.send_message(message.chat.id, approved_message)  # Send to user's DM
@@ -183,7 +201,8 @@ def process_cards(message, file_path, user_id, ko):
                 cm = types.InlineKeyboardButton(f"• ➼ {last} •", callback_data='u8')
                 cm3 = types.InlineKeyboardButton(f"• 𝗗𝗲𝗮𝗱 ❌: [ {dd} ] •", callback_data='x')
                 cm4 = types.InlineKeyboardButton(f"• 𝗧𝗼𝘁𝗮𝗹 💎: [ {total} ] •", callback_data='x')
-                mes.add(cm1, cm, cm2, cm3, cm4)
+                stop_btn = types.InlineKeyboardButton("[ 𝗦𝘁𝗼𝗽 🛑 ] ", callback_data='stop_process')
+                mes.add(cm1, cm, cm2, cm3, cm4, stop_btn)
 
                 bot.edit_message_text(chat_id=message.chat.id, message_id=ko, text='''𝘾𝙃𝙀𝘾𝙆𝙄𝙉𝙂 𝙔𝙊𝙐𝙍 𝘾𝘼𝙍𝘿𝙎...''', reply_markup=mes)
 
@@ -195,7 +214,7 @@ def process_cards(message, file_path, user_id, ko):
         bot.send_message(message.chat.id, "✅ 𝘾𝙝𝙚𝙘𝙠𝙞𝙣𝙜 𝙘𝙤𝙢𝙥𝙡𝙚𝙩𝙚! 𝙔𝙤𝙪 𝙘𝙖𝙣 𝙣𝙤𝙬 𝙨𝙚𝙣𝙙 𝙖 𝙣𝙚𝙬 𝙛𝙞𝙡𝙚.")
 
 # Handle stop button
-@bot.message_handler(commands=["stop"])
+@bot.callback_query_handler(func=lambda call: call.data == 'stop_process')
 def stop_processing_callback(call):
     user_id = str(call.from_user.id)
     if user_id in processing and processing[user_id]:
